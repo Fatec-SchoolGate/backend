@@ -11,11 +11,9 @@ export class AuthController {
     
     @Post("signIn")
     async signIn(@Body() request: LoginDto) {
-        const user = await this.authService.signIn(request);
+        const accessToken = await this.authService.signIn(request);
         
-        return {
-            user
-        };
+        return accessToken;
     }
 
     @Put("register")

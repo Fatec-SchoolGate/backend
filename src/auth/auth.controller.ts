@@ -18,11 +18,12 @@ export class AuthController {
 
     @Put("register")
     async register(@Body() request: CreateUserDto) {
-        const user = await this.authService.createUser(request);
+        const { user, accessToken } = await this.authService.createUser(request);
 
         return {
             success: true,
-            user
+            user,
+            accessToken
         };
     }
 

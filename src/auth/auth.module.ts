@@ -20,7 +20,7 @@ config()
             global: true,
             privateKey: process.env.JWT_SECRET_KEY,
             signOptions: {
-                expiresIn: "60s"
+                expiresIn: "12h"
             }
         })
     ],

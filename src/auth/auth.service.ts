@@ -12,9 +12,19 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  public createUser(createUserDto: CreateUserDto) {
-    const user = this.usersService.userRepository.create(createUserDto);
-    return this.usersService.userRepository.save(user);
+  public async createUser(createUserDto: CreateUserDto) {
+    const userEntity = this.usersService.userRepository.create(createUserDto);
+    const user = await this.usersService.userRepository.save(userEntity);
+
+    const accessToken = await this.jwtService.signAsync({
+      sub: user.id,
+      email: user.email
+    });
+
+    return {
+      user,
+      accessToken
+    };
   }
 
   public async signIn(loginDto: LoginDto) {

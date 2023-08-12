@@ -1,21 +1,23 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from "bcryptjs";
 import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/sequelize';
+import { User } from './models/user.model';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    @InjectModel(User)
+    private user: typeof User
   ) {}
-
+  
   public async createUser(createUserDto: CreateUserDto) {
-    const userEntity = this.usersService.userRepository.create(createUserDto);
-    const user = await this.usersService.userRepository.save(userEntity);
-
+    
+    const user = await this.user.create<User>({ ...createUserDto });
+  
     const accessToken = await this.jwtService.signAsync({
       sub: user.id,
       email: user.email
@@ -28,7 +30,7 @@ export class AuthService {
   }
 
   public async signIn(loginDto: LoginDto) {
-    const user = await this.usersService.userRepository.findOne({
+    const user = await this.user.findOne({
       where: {
         email: loginDto.email
       }
@@ -48,8 +50,10 @@ export class AuthService {
     };
   }
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
+  async validateUser(name: string, pass: string): Promise<any> {
+    const user = await this.user.findOne({
+      where: { name }
+    });
     if (user && user.password === pass) {
       const { password, ...result } = user;
       return result;

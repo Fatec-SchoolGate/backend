@@ -10,5 +10,4 @@ export class CreateUserDto {
 
     @Length(8, 255, { message: "Password has to be between 8 and 255 characters" })
     password: string;
-
 }

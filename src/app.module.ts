@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './auth/models/user.model';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { Organization } from './organizations/organization.model';
+import { OrganizationUsersModule } from './organization_users/organization_users.module';
+import { OrganizationUser } from './organization_users/organization_users.model';
 
 @Module({
   imports: [
@@ -25,11 +27,13 @@ import { Organization } from './organizations/organization.model';
       },
       models: [
         User,
-        Organization
+        Organization,
+        OrganizationUser
       ]
     }),
     AuthModule,
     OrganizationsModule,
+    OrganizationUsersModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],

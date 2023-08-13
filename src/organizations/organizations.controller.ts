@@ -1,14 +1,16 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('organizations')
+@UseGuards(AuthGuard)
 export class OrganizationsController {
   constructor(private readonly organizationsService: OrganizationsService) {}
 
   @Post()
-  async createOrganization(@Body() createOrganizationDto: CreateOrganizationDto) {
-    const organization = await this.organizationsService.createOrganization(createOrganizationDto);
+  async createOrganization(@Body() createOrganizationDto: CreateOrganizationDto, @Request() request) {
+    const organization = await this.organizationsService.createOrganization(createOrganizationDto, request.user.id);
 
     return {
       organization
@@ -16,7 +18,7 @@ export class OrganizationsController {
   }
 
   @Get()
-  async getOrganizations() {
+  async getOrganizations(@Request() { user }) {
     const organizations = await this.organizationsService.getOrganizations();
 
     return {

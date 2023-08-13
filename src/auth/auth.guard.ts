@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
+import { User } from './models/user.model';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -17,13 +18,19 @@ export class AuthGuard implements CanActivate {
     
     try {
       const user = await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET_KEY });
-      console.log(user);
-      request["user"] = user;
+      request["user"] = await this.getUser(user);
     } catch {
       throw new UnauthorizedException();
     }
 
     return true;
+  }
+
+  private async getUser(user) {
+    if (!user?.sub) throw new UnauthorizedException();
+    return await User.findOne({
+      where: { id: user.sub }
+    });
   }
 
   private extractToken(request: Request): string | undefined {

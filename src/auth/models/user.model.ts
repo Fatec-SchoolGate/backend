@@ -20,6 +20,9 @@ export class User extends Model {
     @Column
     password: string;
 
+    @Column
+    profileImage: string;
+
     @BeforeCreate
     static async hashPassword(user) {
         user.password = await bcrypt.hash(user.password, 10);

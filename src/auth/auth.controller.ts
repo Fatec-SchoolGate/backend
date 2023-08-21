@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Request, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { BufferedFile } from 'src/minio-client/file.model';
 
 @Controller('auth')
 export class AuthController {
@@ -17,13 +19,16 @@ export class AuthController {
     }
 
     @Put("register")
-    async register(@Body() request: CreateUserDto) {
-        const { user, accessToken } = await this.authService.createUser(request);
+    @UseInterceptors(FileInterceptor("profileImage"))
+    async register(@Body() request: CreateUserDto, @UploadedFile() profileImage: BufferedFile) {
+        // const { user, accessToken } = await this.authService.createUser(request);
+        console.log(profileImage);
+        this.authService.uploadProfileImage(profileImage);
 
         return {
             success: true,
-            user,
-            accessToken
+            // user,
+            // accessToken
         };
     }
 

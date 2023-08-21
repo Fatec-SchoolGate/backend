@@ -10,6 +10,7 @@ import { OrganizationsModule } from './organizations/organizations.module';
 import { Organization } from './organizations/organization.model';
 import { OrganizationUsersModule } from './organization_users/organization_users.module';
 import { OrganizationUser } from './organization_users/organization_users.model';
+import { MinioClientModule } from './minio-client/minio-client.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { OrganizationUser } from './organization_users/organization_users.model'
     AuthModule,
     OrganizationsModule,
     OrganizationUsersModule,
+    MinioClientModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],

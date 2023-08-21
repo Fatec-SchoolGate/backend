@@ -5,17 +5,19 @@ import * as bcrypt from "bcryptjs";
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './models/user.model';
+import { BufferedFile } from 'src/minio-client/file.model';
+import { MinioClientService } from 'src/minio-client/minio-client.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
+    private minioService: MinioClientService,
     @InjectModel(User)
-    private user: typeof User
+    private user: typeof User,
   ) {}
   
   public async createUser(createUserDto: CreateUserDto) {
-    
     if (await this.user.findOne({ where: { email: createUserDto.email } }) != null) throw new ConflictException("userExists");
 
     const user = await this.user.create<User>({ ...createUserDto });
@@ -29,6 +31,11 @@ export class AuthService {
       user,
       accessToken
     };
+  }
+
+  public async uploadProfileImage(profileImage: BufferedFile) {
+    const profileImagePath = this.minioService.upload(profileImage);
+    console.log(profileImagePath);
   }
 
   public async signIn(loginDto: LoginDto) {

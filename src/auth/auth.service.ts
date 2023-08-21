@@ -5,14 +5,13 @@ import * as bcrypt from "bcryptjs";
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './models/user.model';
-import { BufferedFile } from 'src/minio-client/file.model';
-import { MinioClientService } from 'src/minio-client/minio-client.service';
+import { FirebaseStorageService } from 'src/firebase_storage/firebase_storage.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private minioService: MinioClientService,
+    private firebaseStorageService: FirebaseStorageService,
     @InjectModel(User)
     private user: typeof User,
   ) {}
@@ -33,9 +32,8 @@ export class AuthService {
     };
   }
 
-  public async uploadProfileImage(profileImage: BufferedFile) {
-    const profileImagePath = this.minioService.upload(profileImage);
-    console.log(profileImagePath);
+  public async uploadProfileImage(profileImage: Express.Multer.File) {
+    this.firebaseStorageService.uploadImage(profileImage);
   }
 
   public async signIn(loginDto: LoginDto) {

@@ -10,7 +10,7 @@ import { OrganizationsModule } from './organizations/organizations.module';
 import { Organization } from './organizations/organization.model';
 import { OrganizationUsersModule } from './organization_users/organization_users.module';
 import { OrganizationUser } from './organization_users/organization_users.model';
-import { MinioClientModule } from './minio-client/minio-client.module';
+import { FirebaseStorageModule } from './firebase_storage/firebase_storage.module';
 
 @Module({
   imports: [
@@ -35,7 +35,7 @@ import { MinioClientModule } from './minio-client/minio-client.module';
     AuthModule,
     OrganizationsModule,
     OrganizationUsersModule,
-    MinioClientModule,
+    FirebaseStorageModule
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],

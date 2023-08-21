@@ -4,7 +4,6 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { BufferedFile } from 'src/minio-client/file.model';
 
 @Controller('auth')
 export class AuthController {
@@ -20,9 +19,8 @@ export class AuthController {
 
     @Put("register")
     @UseInterceptors(FileInterceptor("profileImage"))
-    async register(@Body() request: CreateUserDto, @UploadedFile() profileImage: BufferedFile) {
+    async register(@Body() request: CreateUserDto, @UploadedFile() profileImage: Express.Multer.File) {
         // const { user, accessToken } = await this.authService.createUser(request);
-        console.log(profileImage);
         this.authService.uploadProfileImage(profileImage);
 
         return {

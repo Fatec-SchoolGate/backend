@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { config } from 'dotenv';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './models/user.model';
-import { MinioClientModule } from 'src/minio-client/minio-client.module';
+import { FirebaseStorageModule } from 'src/firebase_storage/firebase_storage.module';
 
 config()
 
@@ -16,7 +16,7 @@ config()
     imports: [
         PassportModule,
         SequelizeModule.forFeature([User]),
-        MinioClientModule,
+        FirebaseStorageModule,
         JwtModule.register({
             global: true,
             privateKey: process.env.JWT_SECRET_KEY,

@@ -16,14 +16,16 @@ export class AuthService {
     private user: typeof User,
   ) {}
   
-  public async createUser(createUserDto: CreateUserDto) {
+  public async createUser(createUserDto: CreateUserDto, profileImage: string) {
     if (await this.user.findOne({ where: { email: createUserDto.email } }) != null) throw new ConflictException("userExists");
 
-    const user = await this.user.create<User>({ ...createUserDto });
-  
+    const user = await this.user.create<User>({ ...createUserDto, profileImage });
+    delete user.password;
+    
     const accessToken = await this.jwtService.signAsync({
       sub: user.id,
-      email: user.email
+      email: user.email,
+      user
     });
 
     return {
@@ -33,7 +35,7 @@ export class AuthService {
   }
 
   public async uploadProfileImage(profileImage: Express.Multer.File) {
-    this.firebaseStorageService.uploadImage(profileImage);
+    return await this.firebaseStorageService.uploadImage(profileImage);
   }
 
   public async signIn(loginDto: LoginDto) {

@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { createHash } from 'crypto';
 import firebaseAdmin from "firebase-admin";
 
 @Injectable()
 export class FirebaseStorageService {
     public async uploadImage(image: Express.Multer.File) {
         const bucket = firebaseAdmin.storage().bucket();
+        const imageHash = createHash("sha1").update(image.buffer).digest("hex");
         
-        const storageFilePath = `images/${image.originalname}`; //TODO generates random hash
+        const storageFilePath = `${imageHash}`;
         const fileRef = bucket.file(storageFilePath);
         await fileRef.save(image.buffer, {
             metadata: {
@@ -14,7 +16,7 @@ export class FirebaseStorageService {
             }
         });
 
-        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storageFilePath}`;
+        const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${storageFilePath}`;
 
         return publicUrl;
     }

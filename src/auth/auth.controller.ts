@@ -20,13 +20,13 @@ export class AuthController {
     @Put("register")
     @UseInterceptors(FileInterceptor("profileImage"))
     async register(@Body() request: CreateUserDto, @UploadedFile() profileImage: Express.Multer.File) {
-        // const { user, accessToken } = await this.authService.createUser(request);
-        this.authService.uploadProfileImage(profileImage);
-
+        const profilePath = await this.authService.uploadProfileImage(profileImage);
+        const { user, accessToken } = await this.authService.createUser(request, profilePath);
+        console.log(profilePath);
         return {
             success: true,
-            // user,
-            // accessToken
+            user,
+            accessToken
         };
     }
 

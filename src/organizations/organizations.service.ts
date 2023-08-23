@@ -22,18 +22,11 @@ export class OrganizationsService {
             ...createOrganizationDto,
             code: this.generateCode(createOrganizationDto.name)
         });
-        
-        console.log({
-            orgnaizationId: organization.id,
-            userId
-        });
 
         const organizationUser = await this.organizationUser.create({
             organizationId: organization.id,
             userId
         });
-
-        console.log(organizationUser.organization);
 
         return organization;
     }

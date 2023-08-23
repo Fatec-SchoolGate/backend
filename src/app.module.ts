@@ -11,6 +11,8 @@ import { Organization } from './organizations/organization.model';
 import { OrganizationUsersModule } from './organization_users/organization_users.module';
 import { OrganizationUser } from './organization_users/organization_users.model';
 import { FirebaseStorageModule } from './firebase_storage/firebase_storage.module';
+import { SubjectModule } from './subject/subject.module';
+import { Subject } from './subject/subject.model';
 
 @Module({
   imports: [
@@ -29,13 +31,15 @@ import { FirebaseStorageModule } from './firebase_storage/firebase_storage.modul
       models: [
         User,
         Organization,
-        OrganizationUser
+        OrganizationUser,
+        Subject
       ]
     }),
     AuthModule,
     OrganizationsModule,
     OrganizationUsersModule,
-    FirebaseStorageModule
+    FirebaseStorageModule,
+    SubjectModule
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],

@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { GetSubjectDto } from './dto/get_subject_dto';
 import { CreateSubjectDto } from './dto/create_subject_dto';
 import { UpdateSubjectDto } from './dto/update_subject_dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('subjects')
 @UseGuards(AuthGuard)
@@ -27,7 +28,18 @@ export class SubjectController {
   }
 
   @Post("/")
-  async createSubject(@Body() request: CreateSubjectDto) {
+  @UseInterceptors(FileFieldsInterceptor([
+    {
+      name: "displayImage",
+      maxCount: 1
+    },
+    {
+      name: "backgroundImage",
+      maxCount: 1
+    }
+  ]))
+  async createSubject(@Body() request: CreateSubjectDto, @UploadedFiles() images) {
+    console.log("teste")
     this.subjectService.createSubject(request);
   }
 

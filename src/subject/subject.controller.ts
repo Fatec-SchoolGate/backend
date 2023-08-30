@@ -19,12 +19,14 @@ export class SubjectController {
 
   @Get("/:id")
   async getSubject(@Param() params: GetSubjectDto) {
-    this.subjectService.getSubject(params.id);
+    const subject = await this.subjectService.getSubject(params.id);
+    return { subject };
   }
 
   @Delete("/:id")
   async deleteSubject(@Param() params: GetSubjectDto) {
-    this.subjectService.deleteSubject(params.id);
+    const deleted = this.subjectService.deleteSubject(params.id);
+    return { deleted };
   }
 
   @Post("/")
@@ -39,12 +41,14 @@ export class SubjectController {
     }
   ]))
   async createSubject(@Body() request: CreateSubjectDto, @UploadedFiles() images) {
-    console.log("teste")
-    this.subjectService.createSubject(request);
+    const subject = this.subjectService.createSubject(request);
+    return { subject };
   }
 
   @Put("/")
   async updateSubject(@Body() request: UpdateSubjectDto) {
-    this.subjectService.updateSubject(request);
+    const subject = await this.subjectService.updateSubject(request);
+
+    return { subject };
   }
 }

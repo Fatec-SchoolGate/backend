@@ -34,7 +34,7 @@ export class SubjectService {
     async updateSubject(updateSubjectDto: UpdateSubjectDto) {
         const subject = await this.getSubject(updateSubjectDto.id);
 
-        subject.set({ ...updateSubjectDto });
+        return await subject.set({ ...updateSubjectDto });
     }
 
 }

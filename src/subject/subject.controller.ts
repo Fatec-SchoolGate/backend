@@ -46,7 +46,17 @@ export class SubjectController {
   }
 
   @Put("/")
-  async updateSubject(@Body() request: UpdateSubjectDto) {
+  @UseInterceptors(FileFieldsInterceptor([
+    {
+      name: "displayImage",
+      maxCount: 1
+    },
+    {
+      name: "backgroundImage",
+      maxCount: 1
+    }
+  ]))
+  async updateSubject(@Body() request: UpdateSubjectDto, @UploadedFiles() images) {
     const subject = await this.subjectService.updateSubject(request);
 
     return { subject };

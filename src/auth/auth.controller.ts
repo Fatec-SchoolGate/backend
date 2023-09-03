@@ -7,13 +7,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 export class AuthController {
-    
-    constructor (private readonly authService: AuthService) {}
+
+    constructor(private readonly authService: AuthService) { }
 
     @Post("signIn")
     async signIn(@Body() request: LoginDto) {
         const accessToken = await this.authService.signIn(request);
-        
+
         return accessToken;
     }
 

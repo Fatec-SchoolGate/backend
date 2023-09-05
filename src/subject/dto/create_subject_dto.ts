@@ -1,4 +1,4 @@
-import { IsMimeType, IsNotEmpty, IsString } from "class-validator";
+import { IsMimeType, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class CreateSubjectDto {
     @IsString()
@@ -7,6 +7,10 @@ export class CreateSubjectDto {
 
     @IsString()
     description: string;
+
+    @IsNotEmpty()
+    @IsUUID("4")
+    organizationId: string;
 
     displayImage: string;
     backgroundImage: string;

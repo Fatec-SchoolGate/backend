@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { GetSubjectDto } from './dto/get_subject_dto';
 import { CreateSubjectDto } from './dto/create_subject_dto';
 import { UpdateSubjectDto } from './dto/update_subject_dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { GetSubjectsDto } from './dto/get-subjects-dto';
 
 @Controller('subjects')
 @UseGuards(AuthGuard)
@@ -12,8 +13,8 @@ export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 
   @Get("/")
-  async getSubjects() {
-    const subjects = await this.subjectService.getSubjects();
+  async getSubjects(@Query() params: GetSubjectsDto) {
+    const subjects = await this.subjectService.getSubjects(params.organizationId);
     return { subjects };
   }
 

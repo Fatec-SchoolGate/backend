@@ -3,16 +3,29 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Subject } from './subject.model';
 import { CreateSubjectDto } from './dto/create_subject_dto';
 import { UpdateSubjectDto } from './dto/update_subject_dto';
+import { OrganizationSubject } from 'src/organization_subject/organization_subject.model';
 
 @Injectable()
 export class SubjectService {
     constructor(
         @InjectModel(Subject)
-        private readonly subject: typeof Subject
+        private readonly subject: typeof Subject,
+        @InjectModel(OrganizationSubject)
+        private readonly organizationSubject: typeof OrganizationSubject
     ) {}
 
-    async getSubjects() {
-        return await this.subject.findAll();
+    async getSubjects(organizationId: string) {
+        const subjectIds = await this.organizationSubject.findAll({
+            attributes: ["subjectId"],
+            where: { organizationId },
+            raw: true
+        }).then(subjects => subjects.map(subject => subject.subjectId));
+        
+        return await this.subject.findAll({
+            where: {
+                id: subjectIds
+            }
+        });
     }
     
     async getSubject(id: string) {
@@ -28,7 +41,13 @@ export class SubjectService {
     }
 
     async createSubject(createSubjectDto: CreateSubjectDto) {
-        return await this.subject.create({ ...createSubjectDto });
+        const subject = await this.subject.create({ ...createSubjectDto });
+        const organizationSubject = await this.organizationSubject.create({
+            organizationId: createSubjectDto.organizationId,
+            subjectId: subject.id
+        });
+        
+        return subject;
     }
 
     async updateSubject(updateSubjectDto: UpdateSubjectDto) {

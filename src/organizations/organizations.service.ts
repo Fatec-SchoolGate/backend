@@ -25,13 +25,22 @@ export class OrganizationsService {
 
         const organizationUser = await this.organizationUser.create({
             organizationId: organization.id,
-            userId
+            userId,
+            role: "owner"
         });
 
         return organization;
     }
 
-    async getOrganizations() {
-        return await this.organization.findAll();
+    async getOrganizations(userId: string) {
+        const organizationIds = await this.organizationUser.findAll({
+            raw: true,
+            attributes: ["organizationId"],
+            where: { userId }
+        }).then((organizationUsers) => organizationUsers.map((organizationUser) => organizationUser.organizationId));
+        
+        return await this.organization.findAll({
+            where: { id: organizationIds }
+        });
     }
 }

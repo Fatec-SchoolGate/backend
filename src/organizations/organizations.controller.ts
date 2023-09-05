@@ -19,7 +19,7 @@ export class OrganizationsController {
 
   @Get()
   async getOrganizations(@Request() { user }) {
-    const organizations = await this.organizationsService.getOrganizations();
+    const organizations = await this.organizationsService.getOrganizations(user.id);
 
     return {
       organizations

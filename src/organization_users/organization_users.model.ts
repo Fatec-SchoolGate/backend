@@ -26,4 +26,8 @@ export class OrganizationUser extends Model {
 
     @BelongsTo(() => User)
     user: User;
+    
+    @Column(DataType.ENUM({ values: ["owner", "manager", "member"] }))
+    role: string;
+
 }

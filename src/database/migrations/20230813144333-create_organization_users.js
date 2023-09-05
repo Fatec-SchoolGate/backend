@@ -11,6 +11,7 @@ module.exports = {
       },
       organizationId: Sequelize.UUID,
       userId: Sequelize.UUID,
+      role: Sequelize.ENUM("owner", "manager", "member"),
       createdAt: {
         type: Sequelize.DATE
       },

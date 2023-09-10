@@ -15,6 +15,8 @@ import { SubjectModule } from './subject/subject.module';
 import { Subject } from './subject/subject.model';
 import { OrganizationSubjectModule } from './organization_subject/organization_subject.module';
 import { OrganizationSubject } from './organization_subject/organization_subject.model';
+import { SchedulesModule } from './schedules/schedules.module';
+import { Schedule } from './schedules/schedule.modal';
 
 @Module({
   imports: [
@@ -35,7 +37,8 @@ import { OrganizationSubject } from './organization_subject/organization_subject
         Organization,
         OrganizationUser,
         Subject,
-        OrganizationSubject
+        OrganizationSubject,
+        Schedule
       ]
     }),
     AuthModule,
@@ -43,7 +46,8 @@ import { OrganizationSubject } from './organization_subject/organization_subject
     OrganizationUsersModule,
     FirebaseStorageModule,
     SubjectModule,
-    OrganizationSubjectModule
+    OrganizationSubjectModule,
+    SchedulesModule
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],

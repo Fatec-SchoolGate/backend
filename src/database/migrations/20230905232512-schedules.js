@@ -1,16 +1,10 @@
 'use strict';
 
-const tableName = "classes";
+const tableName = "schedules";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
     await queryInterface.createTable(tableName, {
       id: {
         type: Sequelize.UUID,
@@ -20,13 +14,13 @@ module.exports = {
       subjectId: Sequelize.UUID,
       name: Sequelize.STRING,
       description: Sequelize.TEXT,
-      monday: Sequelize.BOOL,
-      tuesday: Sequelize.BOOL,
-      wednesday: Sequelize.BOOL,
-      thursday: Sequelize.BOOL,
-      friday: Sequelize.BOOL,
-      saturday: Sequelize.BOOL,
-      sunday: Sequelize.BOOL,
+      monday: Sequelize.BOOLEAN,
+      tuesday: Sequelize.BOOLEAN,
+      wednesday: Sequelize.BOOLEAN,
+      thursday: Sequelize.BOOLEAN,
+      friday: Sequelize.BOOLEAN,
+      saturday: Sequelize.BOOLEAN,
+      sunday: Sequelize.BOOLEAN,
       startTime: Sequelize.TIME,
       endTime: Sequelize.TIME,
       createdAt: {
@@ -56,6 +50,7 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
+    await queryInterface.removeConstraint(tableName, "fk_subject_id");
     await queryInterface.dropTable(tableName);
   }
 };

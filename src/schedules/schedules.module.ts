@@ -6,6 +6,7 @@ import { Schedule } from './schedule.modal';
 
 @Module({
   imports: [SequelizeModule.forFeature([Schedule])],
+  exports: [SequelizeModule.forFeature([Schedule])],
   controllers: [SchedulesController],
   providers: [SchedulesService]
 })

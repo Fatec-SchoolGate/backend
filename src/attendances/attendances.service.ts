@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import { createCipheriv, createHash, randomBytes } from 'crypto';
@@ -6,6 +6,7 @@ import { concatMap, interval } from 'rxjs';
 import { Attendance } from './attendance.model';
 import { Schedule } from 'src/schedules/schedule.modal';
 import { Op } from 'sequelize';
+import { AttendancesRepository } from './attendances.repository';
 
 @Injectable()
 export class AttendancesService {
@@ -13,14 +14,15 @@ export class AttendancesService {
         private readonly jwtService: JwtService,
         @InjectModel(Attendance) private attendance: typeof Attendance,
         @InjectModel(Schedule) private schedule: typeof Schedule,
-    ) {}
+        @Inject(AttendancesRepository) private readonly attendanceRepository: AttendancesRepository
+    ) { }
 
     public generateAttendanceToken(scheduleId: string) {
         return interval(5000).pipe(concatMap(async (_) => {
             const attendanceToken = await this.jwtService.signAsync({
                 scheduleId
             });
-            
+
             return { data: { attendanceToken } };
         }));
     }
@@ -38,11 +40,11 @@ export class AttendancesService {
             const issuedAtHour = issuedAtDate.getHours();
             const issuedAtMinute = issuedAtDate.getMinutes();
             const issuedAtDay = issuedAtDate.getDay();
-            
+
             const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
             const dayCondition = {};
             dayCondition[days[issuedAtDay]] = true;
-            
+
             const attendanceTime = `${issuedAtHour}:${issuedAtMinute}:00`;
 
             const scheduleExists = await this.schedule.findOne({ where: { id: scheduleId } }) != null;
@@ -62,46 +64,17 @@ export class AttendancesService {
                 },
                 raw: true
             });
-            
-            // if (!schedule) throw new HttpException("SCHEDULE_TIME_RANGE_INVALID", HttpStatus.BAD_REQUEST);
 
-            await this.createAttendance(userId, scheduleId, issuedAtDate);
+            if (!schedule) throw new HttpException("SCHEDULE_TIME_RANGE_INVALID", HttpStatus.BAD_REQUEST);
+
+            await this.attendanceRepository.create(userId, scheduleId, issuedAtDate);
         } catch (e) {
             throw e;
         }
     }
 
-    private async createAttendance(userId: string, scheduleId: string, attendanceDate: Date) {
-        const todayStart = new Date().setHours(0, 0, 0, 0);
-        const now = new Date();
-        const attendanceForTodayExist = (await this.attendance.findAll({
-            where: {
-                userId,
-                scheduleId,
-                attendanceDate: {
-                    [Op.gte]: todayStart,
-                    [Op.lte]: now
-                }
-            },
-            raw: true
-        })).length > 0;
-
-        if (attendanceForTodayExist) throw new HttpException("ATTENDANCE_FOR_TODAY_ALREADY_CREATED", HttpStatus.BAD_REQUEST);
-
-        const weekDayIndex = attendanceDate.getDay();
-        const attendance = await this.attendance.create({
-            userId,
-            scheduleId,
-            attendanceDate,
-            weekDayIndex,
-            authMode: "manual"
-        });
-        console.log(attendance);
-        return attendance;
-    }
-
     // private encrypt(text: string) {
-        
+
     //     const iv = randomBytes(16);
     //     const key = createHash("sha256").update(String("asdjklasdjkladskjkladsjlalkdjlaksd")).digest("base64").substring(0, 32);
     //     const cipher = createCipheriv("aes-256-cbc", key, iv);

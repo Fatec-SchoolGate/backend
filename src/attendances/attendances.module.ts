@@ -4,6 +4,7 @@ import { AttendancesController } from './attendances.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Attendance } from './attendance.model';
 import { SchedulesModule } from 'src/schedules/schedules.module';
+import { AttendancesRepository } from './attendances.repository';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { SchedulesModule } from 'src/schedules/schedules.module';
     SchedulesModule
   ],
   controllers: [AttendancesController],
-  providers: [AttendancesService]
+  providers: [AttendancesService, AttendancesRepository]
 })
-export class AttendancesModule {}
+
+export class AttendancesModule { }

@@ -5,9 +5,21 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Attendance } from './attendance.model';
 import { SchedulesModule } from 'src/schedules/schedules.module';
 import { AttendancesRepository } from './attendances.repository';
+import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
+    RabbitMQModule.forRoot(RabbitMQModule, {
+      exchanges: [
+        {
+          name: 'foo',
+          type: 'direct'
+        },
+      ],
+      uri: "amqp://localhost:5672",
+      enableControllerDiscovery: true
+    }),
     SequelizeModule.forFeature([Attendance]),
     SchedulesModule
   ],

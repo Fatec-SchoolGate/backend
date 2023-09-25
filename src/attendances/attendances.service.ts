@@ -12,7 +12,6 @@ import { AttendancesRepository } from './attendances.repository';
 export class AttendancesService {
     constructor(
         private readonly jwtService: JwtService,
-        @InjectModel(Attendance) private attendance: typeof Attendance,
         @InjectModel(Schedule) private schedule: typeof Schedule,
         @Inject(AttendancesRepository) private readonly attendanceRepository: AttendancesRepository
     ) { }
@@ -34,7 +33,7 @@ export class AttendancesService {
             const { iat, exp, scheduleId } = decodedAttendance;
             const deltaTime = exp - iat;
 
-            if (deltaTime !== 86400 || !scheduleId) throw new UnauthorizedException();
+            if (deltaTime !== 86400 || !scheduleId) throw new HttpException("Expired token", HttpStatus.BAD_REQUEST);
 
             const issuedAtDate = new Date(iat * 1000);
             const issuedAtHour = issuedAtDate.getHours();
@@ -65,9 +64,11 @@ export class AttendancesService {
                 raw: true
             });
 
-            if (!schedule) throw new HttpException("SCHEDULE_TIME_RANGE_INVALID", HttpStatus.BAD_REQUEST);
+            if (!schedule) throw new HttpException("SCHEDULE_TIME_NOT_HAPPENING_NOW", HttpStatus.BAD_REQUEST);
 
-            await this.attendanceRepository.create(userId, scheduleId, issuedAtDate);
+            const attendance = await this.attendanceRepository.create(userId, scheduleId, issuedAtDate);
+            
+            return attendance;
         } catch (e) {
             throw e;
         }

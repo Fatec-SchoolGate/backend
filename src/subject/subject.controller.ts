@@ -42,7 +42,7 @@ export class SubjectController {
     }
   ]))
   async createSubject(@Body() request: CreateSubjectDto, @UploadedFiles() images) {
-    const subject = this.subjectService.createSubject(request);
+    const subject = await this.subjectService.createSubject(request);
     return { subject };
   }
 

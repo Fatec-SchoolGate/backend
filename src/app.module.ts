@@ -20,6 +20,8 @@ import { Schedule } from './schedules/schedule.modal';
 import { ScheduleUsersModule } from './schedule_users/schedule_users.module';
 import { AttendancesModule } from './attendances/attendances.module';
 import { Attendance } from './attendances/attendance.model';
+import { FaceRecognitionQueuesModule } from './face_recognition_queues/face_recognition_queues.module';
+import { FaceRecognitionQueuePhotosModule } from './face_recognition_queue_photos/face_recognition_queue_photos.module';
 
 @Module({
   imports: [
@@ -53,7 +55,9 @@ import { Attendance } from './attendances/attendance.model';
     OrganizationSubjectModule,
     SchedulesModule,
     ScheduleUsersModule,
-    AttendancesModule
+    AttendancesModule,
+    FaceRecognitionQueuesModule,
+    FaceRecognitionQueuePhotosModule
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],

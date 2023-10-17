@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Request, Sse, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Post, Request, Sse, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AttendancesService } from './attendances.service';
 import { Observable } from 'rxjs';
 import { GenerateAttendanceTokenDto } from './dto/generate_attendance_token.dto';
@@ -6,6 +6,7 @@ import { ConfirmAttendanceDto } from './dto/check_attendance_token.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { EventPattern, MessagePattern } from '@nestjs/microservices';
 import { AmqpConnection, RabbitRPC, RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('attendances')
 // @UseGuards(AuthGuard)
@@ -30,20 +31,28 @@ export class AttendancesController {
     return { attendance };
   }
 
+  @Post("confirm-attendance-with-photo")
+  @UseInterceptors(FilesInterceptor("photos"))
+  async confirmAttendanceWithPhoto(@UploadedFiles() photos: Express.Multer.File[]) {
+    await this.attendancesService.confirmAttendanceWithPhoto(photos);
+  }
+
   @Post("recognize-faces")
   async recognizeFaces() {
-    this.amqpConnection.publish("foo", "foo2", {
+    console.log("teste");
+    this.amqpConnection.publish("foo", "foo3", {
       message: "vim ado nestjas"
     })
   }
+
   @RabbitSubscribe({
     queue: "foo2",
     routingKey: "foo",
     exchange: "foo",
     allowNonJsonMessages: true
-})
-async teste() {
-console.log("received a message from python service hehe :)");
-}
+  })
+  async teste() {
+  console.log("received a message from python service hehe :)");
+  }
 
 }

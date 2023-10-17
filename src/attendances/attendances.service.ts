@@ -7,11 +7,15 @@ import { Attendance } from './attendance.model';
 import { Schedule } from 'src/schedules/schedule.modal';
 import { Op } from 'sequelize';
 import { AttendancesRepository } from './attendances.repository';
+import { FirebaseStorageService } from 'src/firebase_storage/firebase_storage.service';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 
 @Injectable()
 export class AttendancesService {
     constructor(
         private readonly jwtService: JwtService,
+        private readonly firebaseStoregeService: FirebaseStorageService,
+        private readonly amqpConnection: AmqpConnection,
         @InjectModel(Schedule) private schedule: typeof Schedule,
         @Inject(AttendancesRepository) private readonly attendanceRepository: AttendancesRepository
     ) { }
@@ -72,6 +76,15 @@ export class AttendancesService {
         } catch (e) {
             throw e;
         }
+    }
+
+    public async confirmAttendanceWithPhoto(photos: Express.Multer.File[]) {
+        const publicUrls = await this.firebaseStoregeService.uploadImages(photos);
+        console.log(publicUrls);
+        
+        await this.amqpConnection.publish("", "face-recognition", {
+            photoUrls: publicUrls
+        });
     }
 
     // private encrypt(text: string) {

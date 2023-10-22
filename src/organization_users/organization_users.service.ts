@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { OrganizationUser } from './organization_users.model';
 import { User } from 'src/auth/models/user.model';
@@ -52,12 +52,26 @@ export class OrganizationUsersService {
         return nonMembers;
     }
 
-    public async addMember(organizationId: string, userIds: string[]) {
+    public async addMembers(organizationId: string, userIds: string[]) {
         for (let i = 0; i < userIds.length; i++) {
             await this.organizationUser.create({
                 organizationId,
                 userId: userIds[i]
             });
         }
+    }
+
+    public async removeMember(organizationId: string, userId: string) {
+        const organizationUser = await this.organizationUser.findOne({
+            where: {
+                userId,
+                organizationId
+            }
+        });
+
+        if (!organizationUser) throw new HttpException("organizationUserNotFound", HttpStatus.BAD_REQUEST);
+        else if (organizationUser.role === "owner") throw new HttpException("cantRemoveOwner", HttpStatus.BAD_REQUEST);
+
+        return await organizationUser.destroy();
     }
 }

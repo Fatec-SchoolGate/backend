@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, Post } from '@nestjs/common';
 import { AddMembersDto } from './dto/add-members-dto';
 import { OrganizationUsersService } from './organization_users.service';
 import { GetMembersDto } from './dto/get-members-dto';
@@ -24,7 +24,14 @@ export class OrganizationUsersController {
     }
 
     @Post("/add-members")
-    public async addMember(@Body() body: AddMembersDto) {
-        await this.organizationUserService.addMember(body.organizationId, body.userIds);
+    public async addMembers(@Body() body: AddMembersDto) {
+        await this.organizationUserService.addMembers(body.organizationId, body.userIds);
+    }
+
+    @Delete("/:organizationId/remove-member/:userId")
+    public async removeMember(@Param() params: { organizationId: string, userId: string }) {
+        const { organizationId, userId } = params;
+        
+        await this.organizationUserService.removeMember(organizationId, userId);
     }
 }

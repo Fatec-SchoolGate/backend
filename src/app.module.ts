@@ -17,7 +17,6 @@ import { OrganizationSubjectModule } from './organization_subject/organization_s
 import { OrganizationSubject } from './organization_subject/organization_subject.model';
 import { SchedulesModule } from './schedules/schedules.module';
 import { Schedule } from './schedules/schedule.modal';
-import { ScheduleUsersModule } from './schedule_users/schedule_users.module';
 import { AttendancesModule } from './attendances/attendances.module';
 import { Attendance } from './attendances/attendance.model';
 import { FaceRecognitionQueuesModule } from './face_recognition_queues/face_recognition_queues.module';
@@ -54,7 +53,6 @@ import { FaceRecognitionQueuePhotosModule } from './face_recognition_queue_photo
     SubjectModule,
     OrganizationSubjectModule,
     SchedulesModule,
-    ScheduleUsersModule,
     AttendancesModule,
     FaceRecognitionQueuesModule,
     FaceRecognitionQueuePhotosModule

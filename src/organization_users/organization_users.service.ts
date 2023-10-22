@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { OrganizationUser } from './organization_users.model';
 import { User } from 'src/auth/models/user.model';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class OrganizationUsersService {
@@ -26,6 +27,29 @@ export class OrganizationUsersService {
         });
 
         return users;
+    }
+
+    public async getNonMembers(organizationId: string) {
+        const userIds = await this.organizationUser.findAll({
+            attributes: ["userId"],
+            where: {
+                organizationId
+            },
+            raw: true
+        }).then((organizationUsers) => organizationUsers.map(organizationUser => organizationUser.userId));
+
+        const nonMembers = await this.user.findAll({
+            where: {
+                id: {
+                    [Op.not]: userIds
+                }
+            },
+            attributes: {
+                exclude: ["password"]
+            }
+        });
+
+        return nonMembers;
     }
 
     public async addMember(organizationId: string, userIds: string[]) {

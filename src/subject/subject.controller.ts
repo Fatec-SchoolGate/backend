@@ -8,7 +8,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { GetSubjectsDto } from './dto/get-subjects-dto';
 
 @Controller('subjects')
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 
@@ -22,6 +22,13 @@ export class SubjectController {
   async getSubject(@Param() params: GetSubjectDto) {
     const subject = await this.subjectService.getSubject(params.id);
     return { subject };
+  }
+
+  @Get("/:id/members-info")
+  async getMembersInfo(@Param() params: { subjectId: string }) {
+    const { subjectId } = params;
+
+    
   }
 
   @Delete("/:id")

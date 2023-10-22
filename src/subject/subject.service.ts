@@ -34,6 +34,11 @@ export class SubjectService {
         });
     }
 
+    // async getMembersInfo() {
+    //     const members = await this.subject.
+    //     const nonMembers = 
+    // }
+
     async deleteSubject(id: string) {
         return await this.subject.destroy({
             where: { id }

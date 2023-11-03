@@ -1,4 +1,5 @@
-import { Column, DataType, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { Subject } from "src/subject/subject.model";
 
 @Table({
     tableName: "schedules"
@@ -10,8 +11,12 @@ export class Schedule extends Model {
     })
     id: string;
 
+    @ForeignKey(() => Subject)
     @Column
     subjectId: string;
+
+    @BelongsTo(() => Subject)
+    subject: Subject;
 
     @Column
     name: string;

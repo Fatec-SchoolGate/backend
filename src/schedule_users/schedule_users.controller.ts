@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Sse } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Sse } from '@nestjs/common';
 import { ScheduleUsersService } from './schedule_users.service';
 import { Observable } from 'rxjs';
 import { GenerateAttendanceTokenDto } from './dto/generate_attendance_token.dto';

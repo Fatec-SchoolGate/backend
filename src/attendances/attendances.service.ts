@@ -24,6 +24,9 @@ export class AttendancesService {
         return interval(5000).pipe(concatMap(async (_) => {
             const attendanceToken = await this.jwtService.signAsync({
                 scheduleId
+            }, {
+                secret: process.env.JWT_ATTENDANCE_SECRET_KEY,
+                expiresIn: "10s"
             });
 
             return { data: { attendanceToken } };
@@ -31,51 +34,53 @@ export class AttendancesService {
     }
 
     public async validateAttendanceToken(attendanceToken: string, userId: string) {
+        let decodedAttendance;
         try {
-            const decodedAttendance = await this.jwtService.verifyAsync(attendanceToken, { secret: process.env.JWT_ATTENDANCE_SECRET_KEY });
-
-            const { iat, exp, scheduleId } = decodedAttendance;
-            const deltaTime = exp - iat;
-
-            if (deltaTime !== 86400 || !scheduleId) throw new HttpException("Expired token", HttpStatus.BAD_REQUEST);
-
-            const issuedAtDate = new Date(iat * 1000);
-            const issuedAtHour = issuedAtDate.getHours();
-            const issuedAtMinute = issuedAtDate.getMinutes();
-            const issuedAtDay = issuedAtDate.getDay();
-
-            const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-            const dayCondition = {};
-            dayCondition[days[issuedAtDay]] = true;
-
-            const attendanceTime = `${issuedAtHour}:${issuedAtMinute}:00`;
-
-            const scheduleExists = await this.schedule.findOne({ where: { id: scheduleId } }) != null;
-
-            if (!scheduleExists) throw new HttpException("SCHEDULE_DONT_EXIST", HttpStatus.FORBIDDEN);
-
-            const schedule = await this.schedule.findOne({
-                where: {
-                    id: scheduleId,
-                    startTime: {
-                        [Op.lte]: attendanceTime
-                    },
-                    endTime: {
-                        [Op.gte]: attendanceTime
-                    },
-                    ...dayCondition
-                },
-                raw: true
-            });
-
-            if (!schedule) throw new HttpException("SCHEDULE_TIME_NOT_HAPPENING_NOW", HttpStatus.BAD_REQUEST);
-
-            const attendance = await this.attendanceRepository.create(userId, scheduleId, issuedAtDate);
-            
-            return attendance;
-        } catch (e) {
-            throw e;
+            decodedAttendance = await this.jwtService.verifyAsync(attendanceToken, { secret: process.env.JWT_ATTENDANCE_SECRET_KEY });
+        } catch (error) {
+            console.log(error);
+            throw new HttpException("tokenDecodeError", HttpStatus.BAD_REQUEST);
         }
+
+        const { iat, exp, scheduleId } = decodedAttendance;
+        // const deltaTime = exp - iat;
+        // console.log(deltaTime, scheduleId);
+        // if (deltaTime !== 86400 || !scheduleId) throw new HttpException("Expired token", HttpStatus.BAD_REQUEST);
+
+        const issuedAtDate = new Date(iat * 1000);
+        const issuedAtHour = issuedAtDate.getHours();
+        const issuedAtMinute = issuedAtDate.getMinutes();
+        const issuedAtDay = issuedAtDate.getDay();
+
+        const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+        const dayCondition = {};
+        dayCondition[days[issuedAtDay]] = true;
+
+        const attendanceTime = `${issuedAtHour}:${issuedAtMinute}:00`;
+
+        const scheduleExists = await this.schedule.findOne({ where: { id: scheduleId } }) != null;
+
+        if (!scheduleExists) throw new HttpException("SCHEDULE_DONT_EXIST", HttpStatus.FORBIDDEN);
+
+        const schedule = await this.schedule.findOne({
+            where: {
+                id: scheduleId,
+                startTime: {
+                    [Op.lte]: attendanceTime
+                },
+                endTime: {
+                    [Op.gte]: attendanceTime
+                },
+                ...dayCondition
+            },
+            raw: true
+        });
+
+        if (!schedule) throw new HttpException("SCHEDULE_TIME_NOT_HAPPENING_NOW", HttpStatus.BAD_REQUEST);
+
+        const attendance = await this.attendanceRepository.create(userId, scheduleId, issuedAtDate);
+        
+        return attendance;
     }
 
     public async confirmAttendanceWithPhoto(photos: Express.Multer.File[]) {

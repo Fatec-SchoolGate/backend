@@ -1,15 +1,14 @@
-import { Body, Controller, Param, Post, Request, Sse, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Request, Sse, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AttendancesService } from './attendances.service';
 import { Observable } from 'rxjs';
 import { GenerateAttendanceTokenDto } from './dto/generate_attendance_token.dto';
 import { ConfirmAttendanceDto } from './dto/check_attendance_token.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { EventPattern, MessagePattern } from '@nestjs/microservices';
-import { AmqpConnection, RabbitRPC, RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import { AmqpConnection, RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('attendances')
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 export class AttendancesController {
   constructor(
     private readonly amqpConnection: AmqpConnection,

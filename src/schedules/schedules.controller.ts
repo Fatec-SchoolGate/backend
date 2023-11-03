@@ -23,4 +23,22 @@ export class SchedulesController {
     return { schedules };
   }
 
+  @Get("/:scheduleId")
+  async getSchedule(@Param() params: { scheduleId: string }) {
+    const { scheduleId } = params;
+
+    const schedule = await this.schedulesService.getSchedule(scheduleId);
+
+    return { schedule };
+  }
+
+  @Get("/:scheduleId/grouped-attendances")
+  async getScheduleGroupedAttendances(@Param() params: { scheduleId: string }) {
+    const { scheduleId } = params;
+    
+    const groupedAttendances = await this.schedulesService.getScheduleGroupedAttendances(scheduleId);
+
+    return { groupedAttendances };
+  }
+
 }

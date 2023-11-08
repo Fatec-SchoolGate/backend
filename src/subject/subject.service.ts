@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Subject } from './subject.model';
 import { CreateSubjectDto } from './dto/create_subject_dto';
 import { UpdateSubjectDto } from './dto/update_subject_dto';
 import { OrganizationSubject } from 'src/organization_subject/organization_subject.model';
+import { User } from 'src/auth/models/user.model';
+import { OrganizationUser } from 'src/organization_users/organization_users.model';
 
 @Injectable()
 export class SubjectService {
@@ -14,7 +16,7 @@ export class SubjectService {
         private readonly organizationSubject: typeof OrganizationSubject
     ) {}
 
-    async getSubjects(organizationId: string) {
+    async getSubjects(organizationId: string, user: User) {
         const subjectIds = await this.organizationSubject.findAll({
             attributes: ["subjectId"],
             where: { organizationId },
@@ -34,19 +36,14 @@ export class SubjectService {
         });
     }
 
-    // async getMembersInfo() {
-    //     const members = await this.subject.
-    //     const nonMembers = 
-    // }
-
     async deleteSubject(id: string) {
         return await this.subject.destroy({
             where: { id }
         });
     }
 
-    async createSubject(createSubjectDto: CreateSubjectDto) {
-        const subject = await this.subject.create({ ...createSubjectDto });
+    async createSubject(createSubjectDto: CreateSubjectDto, user: User) {
+        const subject = await this.subject.create({ ...createSubjectDto, adminUserId: user.id });
         const organizationSubject = await this.organizationSubject.create({
             organizationId: createSubjectDto.organizationId,
             subjectId: subject.id

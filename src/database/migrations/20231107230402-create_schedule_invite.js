@@ -1,6 +1,6 @@
 'use strict';
 
-const tableName = "subjects";
+const tableName = "schedule_invites";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -8,50 +8,36 @@ module.exports = {
     await queryInterface.createTable(tableName, {
       id: {
         type: Sequelize.UUID,
-        allowNull: false,
         unique: true,
         primaryKey: true
       },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      adminUserId: Sequelize.UUID,
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-      },
-      displayImage: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      backgroundImage: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
+      scheduleId: Sequelize.UUID,
       createdAt: {
         type: Sequelize.DATE
       },
       updatedAt: {
         type: Sequelize.DATE
       },
+      deletedAt: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
     });
-    
+
     await queryInterface.addConstraint(tableName, {
-      fields: ["adminUserId"],
+      fields: ["scheduleId"],
       type: "foreign key",
-      name: "fk_admin_user_id",
+      name: "schedule_id",
       references: {
-        table: "users",
+        table: "schedules",
         field: "id"
       },
       onDelete: "cascade",
     });
-
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.removeConstraint(tableName, "fk_admin_user_id");
+    await queryInterface.removeConstraint(tableName, "schedule_id");
     await queryInterface.dropTable(tableName);
   }
 };

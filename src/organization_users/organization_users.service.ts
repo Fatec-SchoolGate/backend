@@ -1,14 +1,16 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { OrganizationUser } from './organization_users.model';
 import { User } from 'src/auth/models/user.model';
 import { Op } from 'sequelize';
+import { OrganizationUsersValidationService } from './organization-users-validation.service';
 
 @Injectable()
 export class OrganizationUsersService {
     constructor(
         @InjectModel(OrganizationUser) private readonly organizationUser: typeof OrganizationUser,
-        @InjectModel(User) private readonly user: typeof User
+        @InjectModel(User) private readonly user: typeof User,
+        @Inject(OrganizationUsersValidationService) private readonly validationService: OrganizationUsersValidationService
     ) { }
 
     public async getMembers(organizationId: string) {
@@ -53,12 +55,11 @@ export class OrganizationUsersService {
     }
 
     public async addMembers(organizationId: string, userIds: string[]) {
-        for (let i = 0; i < userIds.length; i++) {
-            await this.organizationUser.create({
-                organizationId,
-                userId: userIds[i]
-            });
-        }
+        const { validUserIds } = await this.validationService.addMembers(organizationId, userIds);
+        
+        const members = await this.organizationUser.bulkCreate(validUserIds.map((userId) => ({ organizationId, userId, role: "member" })), { ignoreDuplicates: true,  });
+
+        return { members };
     }
 
     public async removeMember(organizationId: string, userId: string) {

@@ -1,4 +1,5 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { ScheduleUser } from "src/schedule_users/schedule-user.model";
 import { Subject } from "src/subject/subject.model";
 
 @Table({
@@ -17,6 +18,9 @@ export class Schedule extends Model {
 
     @BelongsTo(() => Subject)
     subject: Subject;
+
+    @HasMany(() => ScheduleUser, "scheduleId")
+    users: ScheduleUser[];
 
     @Column
     name: string;

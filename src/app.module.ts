@@ -21,6 +21,8 @@ import { AttendancesModule } from './attendances/attendances.module';
 import { Attendance } from './attendances/attendance.model';
 import { FaceRecognitionQueuesModule } from './face_recognition_queues/face_recognition_queues.module';
 import { FaceRecognitionQueuePhotosModule } from './face_recognition_queue_photos/face_recognition_queue_photos.module';
+import { ScheduleUser } from './schedule_users/schedule-user.model';
+import { ScheduleInvite } from './schedules/schedule-invite.modal';
 
 @Module({
   imports: [
@@ -43,6 +45,8 @@ import { FaceRecognitionQueuePhotosModule } from './face_recognition_queue_photo
         Subject,
         OrganizationSubject,
         Schedule,
+        ScheduleUser,
+        ScheduleInvite,
         Attendance
       ]
     }),

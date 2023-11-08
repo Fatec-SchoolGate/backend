@@ -25,7 +25,11 @@ export class OrganizationUsersController {
 
     @Post("/add-members")
     public async addMembers(@Body() body: AddMembersDto) {
-        await this.organizationUserService.addMembers(body.organizationId, body.userIds);
+        const { members } = await this.organizationUserService.addMembers(body.organizationId, body.userIds);
+
+        return {
+            members
+        };
     }
 
     @Delete("/:organizationId/remove-member/:userId")

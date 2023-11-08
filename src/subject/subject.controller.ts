@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { GetSubjectDto } from './dto/get_subject_dto';
@@ -8,13 +8,16 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { GetSubjectsDto } from './dto/get-subjects-dto';
 
 @Controller('subjects')
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 
   @Get("/")
-  async getSubjects(@Query() params: GetSubjectsDto) {
-    const subjects = await this.subjectService.getSubjects(params.organizationId);
+  async getSubjects(@Query() params: GetSubjectsDto, @Request() request) {
+    const { user } = request;
+
+    const subjects = await this.subjectService.getSubjects(params.organizationId, user);
+    
     return { subjects };
   }
 
@@ -48,8 +51,12 @@ export class SubjectController {
       maxCount: 1
     }
   ]))
-  async createSubject(@Body() request: CreateSubjectDto, @UploadedFiles() images) {
-    const subject = await this.subjectService.createSubject(request);
+  async createSubject(@Body() createSubjectDto: CreateSubjectDto, @UploadedFiles() images, @Request() request) {
+    const { user } = request;
+
+    if (!user) return;
+
+    const subject = await this.subjectService.createSubject(createSubjectDto, user);
     return { subject };
   }
 

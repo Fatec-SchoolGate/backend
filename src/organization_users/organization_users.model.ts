@@ -31,3 +31,6 @@ export class OrganizationUser extends Model {
     role: string;
 
 }
+
+//probably not the best place to put this hehe
+export type UserRoles = "owner" | "manager" | "member";

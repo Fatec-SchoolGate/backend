@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Schedule } from './schedule.modal';
@@ -8,6 +8,8 @@ import { User } from 'src/auth/models/user.model';
 import { ScheduleUser } from 'src/schedule_users/schedule-user.model';
 import { OrganizationSubject } from 'src/organization_subject/organization_subject.model';
 import { ScheduleInvite } from './schedule-invite.modal';
+import { ScheduleInviteRepository } from './schedule-invite.repository';
+import { OrganizationUser } from 'src/organization_users/organization_users.model';
 
 @Injectable()
 export class SchedulesService {
@@ -16,7 +18,9 @@ export class SchedulesService {
         @InjectModel(Attendance) private readonly attendance: typeof Attendance,
         @InjectModel(ScheduleUser) private readonly scheduleUser: typeof ScheduleUser,
         @InjectModel(OrganizationSubject) private readonly organizationSubject: typeof OrganizationSubject,
-        @InjectModel(ScheduleInvite) private readonly invite: typeof ScheduleInvite
+        @InjectModel(ScheduleInvite) private readonly invite: typeof ScheduleInvite,
+        @InjectModel(OrganizationUser) private readonly organizationUser: typeof OrganizationUser,
+        @Inject(ScheduleInviteRepository) private readonly inviteRepository: ScheduleInviteRepository
     ) {}
 
     public async getInvites(scheduleId: string) {
@@ -142,5 +146,29 @@ export class SchedulesService {
         }
 
         return attendancesGroupedByDate;
+    }
+
+    public async acceptInvite(inviteId: string, user: User) {
+        const organization = await this.inviteRepository.inviteOrganization(inviteId);
+        
+        if (!organization) throw new HttpException("invalidInvite", HttpStatus.BAD_REQUEST);
+
+        const [organizationUser] = await this.organizationUser.findOrCreate({
+            where: {
+                organizationId: organization.id,
+                userId: user.id
+            },
+            defaults: {
+                organizationId: organization.id,
+                userId: user.id,
+                role: "member"
+            }
+        });
+
+        const [scheduleUser] = await this.scheduleUser.findOrCreate({
+            where: {
+                scheduleId, 
+            }
+        })
     }
 }

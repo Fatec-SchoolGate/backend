@@ -66,6 +66,17 @@ export class SchedulesController {
     return { invites };
   }
 
+  @Post("/accept-invite")
+  public async acceptInvite(@Body() acceptInviteDto: InvalidateScheduleInviteDto, @Request() request) {
+    const { user } = request;
+
+    const { inviteId } = acceptInviteDto;
+
+    await this.schedulesService.acceptInvite(inviteId, user); 
+
+    return inviteId;
+  }
+
   @Post("/create-invite")
   public async createInvite(@Body() createInviteDto: CreateScheduleInviteDto) {
     const { scheduleId } = createInviteDto;

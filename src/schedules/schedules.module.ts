@@ -10,12 +10,14 @@ import { ScheduleInvite } from './schedule-invite.modal';
 import { ScheduleInviteRepository } from './schedule-invite.repository';
 import { Subject } from 'src/subject/subject.model';
 import { Organization } from 'src/organizations/organization.model';
+import { OrganizationUsersModule } from 'src/organization_users/organization_users.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([Schedule, Attendance, ScheduleInvite, Subject, Organization]),
     ScheduleUsersModule,
-    OrganizationSubjectModule
+    OrganizationSubjectModule,
+    OrganizationUsersModule
   ],
   exports: [SequelizeModule.forFeature([Schedule])],
   controllers: [SchedulesController],

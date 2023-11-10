@@ -89,6 +89,9 @@ export class SchedulesService {
             include: [
                 {
                     model: ScheduleUser
+                },
+                {
+                    model: Subject
                 }
             ]
         });
@@ -149,9 +152,10 @@ export class SchedulesService {
     }
 
     public async acceptInvite(inviteId: string, user: User) {
+        const schedule = await this.inviteRepository.inviteSchedule(inviteId);
         const organization = await this.inviteRepository.inviteOrganization(inviteId);
         
-        if (!organization) throw new HttpException("invalidInvite", HttpStatus.BAD_REQUEST);
+        if (!organization || !schedule) throw new HttpException("invalidInvite", HttpStatus.BAD_REQUEST);
 
         const [organizationUser] = await this.organizationUser.findOrCreate({
             where: {
@@ -167,7 +171,12 @@ export class SchedulesService {
 
         const [scheduleUser] = await this.scheduleUser.findOrCreate({
             where: {
-                scheduleId, 
+                scheduleId: schedule.id,
+                userId: user.id
+            },
+            defaults: {
+                scheduleId: schedule.id,
+                userId: user.id
             }
         })
     }

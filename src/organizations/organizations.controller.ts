@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -24,5 +24,14 @@ export class OrganizationsController {
     return {
       organizations
     };
+  }
+
+  @Get("/:organizationId")
+  public async getOrganization(@Param() params: { organizationId: string }, @Request() { user }) {
+    const { organizationId } = params;
+
+    const organization = await this.organizationsService.getOrganization(organizationId, user.id);
+
+    return { organization };
   }
 }

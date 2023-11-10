@@ -76,4 +76,21 @@ export class OrganizationsService {
 
         return organizationsWithRole;
     }
+
+    public async getOrganization(organizationId: string, userId: string) {
+        const organizationUser = await this.organizationUser.findOne({
+            where: {
+                userId,
+                organizationId
+            }
+        });
+
+        if (!organizationUser) throw new HttpException("noPermission", HttpStatus.FORBIDDEN);
+        
+        const organization = await this.organization.findOne({ where: { id: organizationId } });
+
+        organization.dataValues.userRole = organizationUser.role;
+
+        return organization;
+    }
 }

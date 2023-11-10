@@ -16,7 +16,7 @@ export class ScheduleInviteRepository {
         @InjectModel(Organization) private readonly organization: typeof Organization
     ) {}
 
-    public async inviteOrganization(inviteId: string): Promise<Organization | null> {
+    public async findById(inviteId: string) {
         const invite = await this.invite.findOne({
             where: { id: inviteId },
             include: [
@@ -31,9 +31,19 @@ export class ScheduleInviteRepository {
             ]
         });
 
+        return invite;
+    }
+
+    public async inviteSchedule(inviteId: string) {
+        const invite = await this.findById(inviteId);
+
         if (!invite) return null;
 
-        const schedule = invite.schedule;
+        return invite.schedule;
+    }
+
+    public async inviteOrganization(inviteId: string): Promise<Organization | null> {
+        const schedule = await this.inviteSchedule(inviteId);
 
         if (!schedule) return null;
 

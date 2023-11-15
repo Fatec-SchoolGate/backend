@@ -40,10 +40,10 @@ export class SchedulesController {
   }
 
   @Get("/:scheduleId")
-  async getSchedule(@Param() params: { scheduleId: string }) {
+  async getSchedule(@Param() params: { scheduleId: string }, @Request() { user }) {
     const { scheduleId } = params;
 
-    const schedule = await this.schedulesService.getSchedule(scheduleId);
+    const schedule = await this.schedulesService.getSchedule(scheduleId, user.id);
 
     return { schedule };
   }
@@ -55,6 +55,15 @@ export class SchedulesController {
     const groupedAttendances = await this.schedulesService.getScheduleGroupedAttendances(scheduleId);
 
     return { groupedAttendances };
+  }
+
+  @Get("/invite/:inviteId")
+  public async getInvite(@Param() params: { inviteId: string }) {
+    const { inviteId } = params;
+
+    const invite = await this.schedulesService.getInvite(inviteId);
+
+    return { invite };
   }
 
   @Get("/:scheduleId/invites")
@@ -72,9 +81,9 @@ export class SchedulesController {
 
     const { inviteId } = acceptInviteDto;
 
-    await this.schedulesService.acceptInvite(inviteId, user); 
+    const [organizationUser, scheduleUser] = await this.schedulesService.acceptInvite(inviteId, user); 
 
-    return inviteId;
+    return { organizationUser, scheduleUser };
   }
 
   @Post("/create-invite")

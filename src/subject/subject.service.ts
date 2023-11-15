@@ -23,11 +23,17 @@ export class SubjectService {
             raw: true
         }).then(subjects => subjects.map(subject => subject.subjectId));
         
-        return await this.subject.findAll({
+        const subjects = await this.subject.findAll({
             where: {
                 id: subjectIds
             }
-        });
+        }).then((subjects) => subjects.map(subjects => {
+            subjects.dataValues.currentUserRole = subjects.adminUserId === user.id ? "owner" : "member";
+
+            return subjects;
+        }));
+
+        return subjects;
     }
     
     async getSubject(id: string) {

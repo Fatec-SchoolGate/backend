@@ -22,6 +22,19 @@ export class SchedulesService {
         @InjectModel(OrganizationUser) private readonly organizationUser: typeof OrganizationUser,
         @Inject(ScheduleInviteRepository) private readonly inviteRepository: ScheduleInviteRepository
     ) {}
+    
+    public async getInvite(inviteId: string) {
+        const invite = await this.invite.findOne({
+            where: {
+                id: inviteId
+            },
+            include: [
+                { model: Schedule, include: [ { model: Subject, include: [ { model: OrganizationSubject } ] } ] }
+            ]
+        });
+
+        return invite;
+    }
 
     public async getInvites(scheduleId: string) {
         const invites = await this.invite.findAll({
@@ -99,7 +112,7 @@ export class SchedulesService {
         return schedules;
     }
 
-    async getSchedule(scheduleId: string) {
+    async getSchedule(scheduleId: string, userId: string) {
         const schedule = await this.schedule.findOne({
             where: { id: scheduleId },
             include: [
@@ -108,6 +121,8 @@ export class SchedulesService {
                 }
             ]
         });
+
+        if (schedule.subject) schedule.dataValues.isAdmin = schedule.subject.adminUserId == userId;
 
         return schedule;
     }
@@ -178,6 +193,8 @@ export class SchedulesService {
                 scheduleId: schedule.id,
                 userId: user.id
             }
-        })
+        });
+
+        return [organizationUser, scheduleUser];
     }
 }

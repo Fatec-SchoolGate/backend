@@ -3,6 +3,10 @@ import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Organization } from './organization.model';
 import { OrganizationUser, UserRoles } from 'src/organization_users/organization_users.model';
+import { OrganizationSubject } from 'src/organization_subject/organization_subject.model';
+import { Subject } from 'src/subject/subject.model';
+import { Schedule } from 'src/schedules/schedule.modal';
+import { User } from 'src/auth/models/user.model';
 
 @Injectable()
 export class OrganizationsService {
@@ -77,6 +81,16 @@ export class OrganizationsService {
         return organizationsWithRole;
     }
 
+    private extractSchedulesFromOrganization(organization: Organization): Schedule[] {
+        const organizationSubjects = organization.organizationSubjects;
+
+        const subjects = organizationSubjects.map((organizationSubject) => organizationSubject.subject);
+
+        const schedules = subjects.map((subject) => subject.schedules).flat();
+
+        return schedules;
+    }
+
     public async getOrganization(organizationId: string, userId: string) {
         const organizationUser = await this.organizationUser.findOne({
             where: {
@@ -87,8 +101,27 @@ export class OrganizationsService {
 
         if (!organizationUser) throw new HttpException("noPermission", HttpStatus.FORBIDDEN);
         
-        const organization = await this.organization.findOne({ where: { id: organizationId } });
+        const organization = await this.organization.findOne({
+            where: { id: organizationId },
+            include: [
+                {
+                    model: OrganizationSubject,
+                    include: [
+                        {
+                            model: Subject,
+                            include: [
+                                {
+                                    model: Schedule
+                                }
+                            ]
+                        }
+                    ]
+                },
+                { model: OrganizationUser }
+            ]
+        });
 
+        organization.dataValues.schedules = this.extractSchedulesFromOrganization(organization);
         organization.dataValues.userRole = organizationUser.role;
 
         return organization;

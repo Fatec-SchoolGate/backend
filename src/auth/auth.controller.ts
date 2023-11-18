@@ -4,6 +4,8 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { randomFileName } from 'src/utils/random-file-name';
 
 @Controller('auth')
 export class AuthController {
@@ -18,11 +20,17 @@ export class AuthController {
     }
 
     @Put("register")
-    @UseInterceptors(FileInterceptor("profileImage"))
+    @UseInterceptors(FileInterceptor("profileImage", {
+        storage: diskStorage({
+            destination: "./files/images/profileImages",
+            filename: randomFileName
+        })
+    }))
     async register(@Body() request: CreateUserDto, @UploadedFile() profileImage: Express.Multer.File) {
-        const profilePath = await this.authService.uploadProfileImage(profileImage);
-        const { user, accessToken } = await this.authService.createUser(request, profilePath);
-        console.log(profilePath);
+        // const profilePath = await this.authService.uploadProfileImage(profileImage);
+        profileImage.path = profileImage.path.replace("files/", "");
+        const { user, accessToken } = await this.authService.createUser(request, profileImage.path);
+        
         return {
             success: true,
             user,

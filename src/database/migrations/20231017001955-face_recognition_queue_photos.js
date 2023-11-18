@@ -12,6 +12,7 @@ module.exports = {
         primaryKey: true
       },
       faceRecognitionQueueId: Sequelize.UUID,
+      imagePath: Sequelize.TEXT,
       createdAt: {
         type: Sequelize.DATE
       },

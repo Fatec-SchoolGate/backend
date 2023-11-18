@@ -1,5 +1,6 @@
 import { HasManyGetAssociationsMixin, NonAttribute } from "sequelize";
 import { Column, DataType, HasMany, Model, PrimaryKey, Table, Unique } from "sequelize-typescript";
+import { OrganizationSubject } from "src/organization_subject/organization_subject.model";
 import { OrganizationUser } from "src/organization_users/organization_users.model";
 
 @Table({
@@ -27,4 +28,7 @@ export class Organization extends Model {
 
     @HasMany(() => OrganizationUser, "organizationId")
     organizationUsers: OrganizationUser[];
+
+    @HasMany(() => OrganizationSubject, "organizationId")
+    organizationSubjects: OrganizationSubject[];
 }

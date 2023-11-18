@@ -22,7 +22,7 @@ export class SchedulesService {
         @InjectModel(OrganizationUser) private readonly organizationUser: typeof OrganizationUser,
         @Inject(ScheduleInviteRepository) private readonly inviteRepository: ScheduleInviteRepository
     ) {}
-    
+
     public async getInvite(inviteId: string) {
         const invite = await this.invite.findOne({
             where: {
@@ -118,6 +118,12 @@ export class SchedulesService {
             include: [
                 {
                     model: Subject
+                },
+                {
+                    model: ScheduleUser,
+                    include: [
+                        { model: User }
+                    ]
                 }
             ]
         });

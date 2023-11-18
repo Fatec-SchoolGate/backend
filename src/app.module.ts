@@ -19,13 +19,19 @@ import { SchedulesModule } from './schedules/schedules.module';
 import { Schedule } from './schedules/schedule.modal';
 import { AttendancesModule } from './attendances/attendances.module';
 import { Attendance } from './attendances/attendance.model';
-import { FaceRecognitionQueuesModule } from './face_recognition_queues/face_recognition_queues.module';
-import { FaceRecognitionQueuePhotosModule } from './face_recognition_queue_photos/face_recognition_queue_photos.module';
 import { ScheduleUser } from './schedule_users/schedule-user.model';
 import { ScheduleInvite } from './schedules/schedule-invite.modal';
+import { FaceRecognitionModule } from './face-recognition/face-recognition.module';
+import { FaceRecognitionQueue } from './face-recognition/models/face-recognition-queue-model';
+import { FaceRecognitionQueuePhoto } from './face-recognition/models/face-recognition-queue-photo';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, "..", "files")
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     SequelizeModule.forRoot({
       dialect: "postgres",
@@ -47,7 +53,9 @@ import { ScheduleInvite } from './schedules/schedule-invite.modal';
         Schedule,
         ScheduleUser,
         ScheduleInvite,
-        Attendance
+        Attendance,
+        FaceRecognitionQueue,
+        FaceRecognitionQueuePhoto
       ]
     }),
     AuthModule,
@@ -58,8 +66,7 @@ import { ScheduleInvite } from './schedules/schedule-invite.modal';
     OrganizationSubjectModule,
     SchedulesModule,
     AttendancesModule,
-    FaceRecognitionQueuesModule,
-    FaceRecognitionQueuePhotosModule
+    FaceRecognitionModule
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],

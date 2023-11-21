@@ -9,6 +9,7 @@ import { Op } from 'sequelize';
 import { AttendancesRepository } from './attendances.repository';
 import { FirebaseStorageService } from 'src/firebase_storage/firebase_storage.service';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import { User } from 'src/auth/models/user.model';
 
 @Injectable()
 export class AttendancesService {
@@ -20,13 +21,17 @@ export class AttendancesService {
         @Inject(AttendancesRepository) private readonly attendanceRepository: AttendancesRepository
     ) { }
 
+    public async getAttendancesByUser(user: User, scheduleId?: string) {
+        return await this.attendanceRepository.byUserId(user.id, scheduleId);
+    }
+
     public generateAttendanceToken(scheduleId: string) {
         return interval(5000).pipe(concatMap(async (_) => {
             const attendanceToken = await this.jwtService.signAsync({
                 scheduleId
             }, {
                 secret: process.env.JWT_ATTENDANCE_SECRET_KEY,
-                expiresIn: "10s"
+                expiresIn: "10000s"
             });
 
             return { data: { attendanceToken } };

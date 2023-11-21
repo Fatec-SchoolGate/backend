@@ -24,6 +24,12 @@ export class AttendancesRepository {
         return attendance;
     }
 
+    public async byUserId(userId: string, scheduleId?: string) {
+        return await this.attendance.findAll({
+            where: { userId, ...(scheduleId && { scheduleId }) }
+        });
+    }
+
     public async hasUserAttendedTodayForSubject(userId: string, scheduleId: string) {
         const todayStart = new Date().setHours(0, 0, 0, 0);
         const now = new Date();

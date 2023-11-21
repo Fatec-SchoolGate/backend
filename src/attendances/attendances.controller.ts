@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Request, Sse, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Request, Sse, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AttendancesService } from './attendances.service';
 import { Observable } from 'rxjs';
 import { GenerateAttendanceTokenDto } from './dto/generate_attendance_token.dto';
@@ -28,6 +28,15 @@ export class AttendancesController {
     const attendance = await this.attendancesService.validateAttendanceToken(attendanceToken, user.id);
 
     return { attendance };
+  }
+
+  @Get("attendances-by-user")
+  public async getAttendancesByUser(@Request() { user }, @Query() query: { scheduleId?: string }) {
+    const { scheduleId } = query;
+
+    const attendances = await this.attendancesService.getAttendancesByUser(user, scheduleId);
+
+    return attendances;
   }
 
   @Post("confirm-attendance-with-photo")

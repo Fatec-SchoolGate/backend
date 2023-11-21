@@ -21,6 +21,8 @@ export class FaceRecognitionController {
     targetImage.path = targetImage.path.replace("files/", "");
     const queue = await this.faceRecognitionService.createQueue(scheduleId, targetImage);
 
+    await this.faceRecognitionService.triggerFaceRecognitionService(queue.queue.id);
+
     return queue;
   }
 

@@ -4,6 +4,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateQueueDto } from './dto/create-queue-dto';
 import { Multer, diskStorage } from 'multer';
 import { randomFileName } from 'src/utils/random-file-name';
+import { RegisterAttendancesDto } from './dto/register-attendances';
 
 @Controller('face-recognition')
 export class FaceRecognitionController {
@@ -33,5 +34,12 @@ export class FaceRecognitionController {
     const info = await this.faceRecognitionService.getInfo(queueId);
 
     return info;
+  }
+
+  @Post("/register-attendances")
+  public async registerAttendances(@Body() registerAttendances: RegisterAttendancesDto) {
+    const attendances = await this.faceRecognitionService.registerAttendances(registerAttendances.scheduleId, registerAttendances.userIds);
+
+    return attendances;
   }
 }

@@ -10,7 +10,7 @@ export class AttendancesRepository {
     ) { }
 
     public async create(userId: string, scheduleId: string, attendanceDate: Date) {
-        if (await this.hasUserAttendedTodayForSubject(userId, scheduleId)) throw new HttpException("ATTENDANCE_FOR_TODAY_ALREADY_CREATED", HttpStatus.BAD_REQUEST);
+        if (await this.hasUserAttendedTodayForSubject(userId, scheduleId)) return false;
 
         const weekDayIndex = attendanceDate.getDay();
         const attendance = await this.attendance.create({

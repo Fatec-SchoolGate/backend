@@ -84,6 +84,7 @@ export class AttendancesService {
         if (!schedule) throw new HttpException("SCHEDULE_TIME_NOT_HAPPENING_NOW", HttpStatus.BAD_REQUEST);
 
         const attendance = await this.attendanceRepository.create(userId, scheduleId, issuedAtDate);
+        if (!attendance) throw new HttpException("ATTENDANCE_FOR_TODAY_ALREADY_CREATED", HttpStatus.BAD_REQUEST)
         
         return attendance;
     }

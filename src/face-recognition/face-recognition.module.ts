@@ -7,6 +7,7 @@ import { FaceRecognitionQueue } from './models/face-recognition-queue-model';
 import { FirebaseStorageModule } from 'src/firebase_storage/firebase_storage.module';
 import { FaceRecognitionQueuePhoto } from './models/face-recognition-queue-photo';
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
+import { AttendancesModule } from 'src/attendances/attendances.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
       enableControllerDiscovery: true
     }),
     FirebaseStorageModule,
+    AttendancesModule,
     SequelizeModule.forFeature([FaceRecognitionQueue, FaceRecognitionQueuePhoto]),
     SchedulesModule
   ],

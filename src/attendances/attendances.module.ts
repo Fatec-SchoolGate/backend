@@ -26,7 +26,8 @@ import { FirebaseStorageModule } from 'src/firebase_storage/firebase_storage.mod
     SchedulesModule
   ],
   controllers: [AttendancesController],
-  providers: [AttendancesService, AttendancesRepository]
+  providers: [AttendancesService, AttendancesRepository],
+  exports: [AttendancesRepository]
 })
 
 export class AttendancesModule { }
